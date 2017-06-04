@@ -1,0 +1,20 @@
+#!/bin/sh
+#
+# See https://users.rust-lang.org/t/howto-generating-a-branch-coverage-report/8524
+
+set -e
+
+sudo apt-get install -y llvm-3.9 lcov
+
+rm -rf lcov-llvm && mkdir -p lcov-llvm
+cd lcov-llvm
+
+git clone https://github.com/rust-lang/rust.git
+cd rust
+patch -p1 < ../../llvm-lcov.patch
+
+mkdir build
+cd build
+../configure --enable-rustbuild --prefix=$PWD/inst
+make install
+rustup toolchain link branch-coverage $PWD/inst
